@@ -13,13 +13,13 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #ffffff;
-      --surface: #ffffff;
-      --border: rgba(60,60,67,0.1);
-      --text: #1c1c1e;
+      --bg: #1c1c1e;
+      --surface: #2c2c2e;
+      --border: rgba(255,255,255,0.1);
+      --text: #ffffff;
       --muted: #8e8e93;
       --radius: 16px;
-      --card-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+      --card-shadow: 0 1px 3px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
     }
 
     body {
@@ -86,11 +86,11 @@
       flex: 0 0 auto;
     }
 
-    .urgency-tonight .badge  { background: rgba(255,59,48,0.12); color: #ff3b30; }
+    .urgency-tonight .badge  { background: rgba(52,199,89,0.18); color: #34c759; }
     .urgency-tonight .badge-dot { animation: blink 1.4s ease-in-out infinite; }
-    .urgency-today   .badge  { background: rgba(255,149,0,0.12); color: #ff9500; }
-    .urgency-soon    .badge  { background: rgba(255,159,10,0.12); color: #ff9f0a; }
-    .urgency-upcoming .badge { background: rgba(0,122,255,0.1); color: #007aff; }
+    .urgency-today   .badge  { background: rgba(52,199,89,0.18); color: #34c759; }
+    .urgency-soon    .badge  { background: rgba(52,199,89,0.18); color: #34c759; }
+    .urgency-upcoming .badge { background: rgba(52,199,89,0.12); color: #34c759; }
     .urgency-later   .badge  { background: rgba(52,199,89,0.12); color: #34c759; }
     .urgency-unknown .badge  { background: rgba(142,142,147,0.12); color: #8e8e93; }
 
