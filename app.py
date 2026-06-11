@@ -188,6 +188,19 @@ def index():
         bins=BINS,
     )
 
+@app.route('/debug/raw')
+def debug_raw():
+    if not COUNCIL_ID:
+        return 'COUNCIL_ID not set', 400
+    try:
+        resp = requests.get(COUNCIL_URL, timeout=15,
+                            headers={'User-Agent': 'Mozilla/5.0 (compatible; BinDayBot/1.0)'})
+        soup = BeautifulSoup(resp.text, 'html.parser')
+        lines = [l.strip() for l in soup.get_text(separator='\n').split('\n') if l.strip()]
+        return '<pre>' + '\n'.join(lines[:200]) + '</pre>'
+    except Exception as e:
+        return str(e), 500
+
 @app.route('/api/schedule')
 def api_schedule():
     upcoming, updated = upcoming_collections(20)
