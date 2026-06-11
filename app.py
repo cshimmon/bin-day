@@ -25,20 +25,19 @@ BINS = {
 MONTH_NAMES = ['January','February','March','April','May','June',
                'July','August','September','October','November','December']
 
-def classify_bins(text):
-    t = text.lower()
-    bins = []
+def bin_key_for_line(line):
+    t = line.lower()
     if 'food' in t or 'caddy' in t:
-        bins.append('grey')
+        return 'grey'
     if 'refuse' in t or 'black' in t:
-        bins.append('black')
+        return 'black'
     if 'garden' in t or 'brown' in t:
-        bins.append('brown')
+        return 'brown'
     if 'blue' in t:
-        bins.append('blue')
+        return 'blue'
     if 'green' in t or 'paper' in t:
-        bins.append('green')
-    return list(dict.fromkeys(bins))
+        return 'green'
+    return None
 
 def scrape_schedule():
     if not COUNCIL_ID:
@@ -51,33 +50,49 @@ def scrape_schedule():
         soup = BeautifulSoup(resp.text, 'html.parser')
         lines = [l.strip() for l in soup.get_text(separator='\n').split('\n') if l.strip()]
 
-        collections = []
-        current_month = current_year = None
+        # Page structure:
+        #   June 2026
+        #   Large food waste caddy
+        #   4th, 11th, 18th, 25th
+        #   Black refuse bin
+        #   11th, 25th
+        date_map = {}  # iso date -> [bin_keys]
+        current_month = current_year = current_bin = None
 
         for line in lines:
+            # Month heading e.g. "June 2026"
             for i, month in enumerate(MONTH_NAMES):
                 if month in line:
                     m = re.search(r'(\d{4})', line)
                     if m:
                         current_month = i + 1
                         current_year = int(m.group(1))
+                        current_bin = None
                         break
 
-            if current_month and current_year:
-                m = re.match(r'^(\d{1,2})(?:st|nd|rd|th)', line)
-                if m:
-                    day = int(m.group(1))
-                    bins = classify_bins(line)
-                    if bins:
-                        try:
-                            d = date(current_year, current_month, day)
-                            iso = d.isoformat()
-                            if not any(c['date'] == iso for c in collections):
-                                collections.append({'date': iso, 'bins': bins})
-                        except ValueError:
-                            pass
+            if not current_month:
+                continue
 
-        collections.sort(key=lambda x: x['date'])
+            # Bin type heading e.g. "Large food waste caddy"
+            key = bin_key_for_line(line)
+            if key:
+                current_bin = key
+                continue
+
+            # Date list e.g. "4th, 11th, 18th, 25th"
+            if current_bin and re.search(r'\d+(?:st|nd|rd|th)', line):
+                for day_str in re.findall(r'(\d+)(?:st|nd|rd|th)', line):
+                    try:
+                        d = date(current_year, current_month, int(day_str))
+                        iso = d.isoformat()
+                        if iso not in date_map:
+                            date_map[iso] = []
+                        if current_bin not in date_map[iso]:
+                            date_map[iso].append(current_bin)
+                    except ValueError:
+                        pass
+
+        collections = [{'date': k, 'bins': v} for k, v in sorted(date_map.items())]
         logger.info(f'Scraped {len(collections)} collections')
         return collections or None
     except Exception as e:
