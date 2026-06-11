@@ -2,8 +2,6 @@
 
 A simple self-hosted web app that shows which bins to put out each week, based on the live Ipswich Borough Council collection schedule. Designed to look great on an iPhone home screen and on an e-ink display.
 
-![Colour mode showing three wheelie bins with "Put out tonight!" badge]
-
 ## Features
 
 - Pulls the real council schedule daily — bank holidays and Christmas changes are handled automatically
